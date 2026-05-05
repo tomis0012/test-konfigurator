@@ -12,3 +12,6 @@
 #thHint{font-size:13px;color:#666;line-height:1.35}
 #thSizeLabel{font-weight:bold;margin-top:12px;display:block}
 @media(max-width:850px){#thGrid{grid-template-columns:1fr}#thBox{margin:0;border-radius:0;min-height:100vh}}
+#thTextTools{display:none;border:1px solid #ddd;padding:10px;margin:8px 0;background:#fafafa}
+#thTextTools label{font-weight:bold;font-size:13px;display:block;margin-top:8px}
+#thTextTools select,#thTextTools input{width:100%;box-sizing:border-box;padding:8px;margin-top:4px}
