@@ -1,1 +1,14 @@
-
+#thBtn{background:#111;color:#fff;padding:14px 20px;border:0;border-radius:6px;cursor:pointer;font-weight:bold;margin:15px 0}
+#thModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:99999}
+#thBox{background:#fff;max-width:1150px;margin:25px auto;padding:18px;border-radius:10px}
+#thTop{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+#thGrid{display:grid;grid-template-columns:1fr 260px;gap:18px}
+#thCanvas{width:100%;border:1px solid #ccc;background:#eee;touch-action:none}
+#thPanel button,#thPanel input{width:100%;box-sizing:border-box;margin:7px 0;padding:11px}
+#thPanel button{cursor:pointer;border:1px solid #aaa;background:#f4f4f4;font-weight:bold}
+#thPanel .primary{background:#111;color:#fff;border:0}
+#thPanel .save{background:#24a324;color:#fff;border:0;margin-top:18px}
+#thClose{background:#ddd;border:0;padding:8px 12px;cursor:pointer}
+#thHint{font-size:13px;color:#666;line-height:1.35}
+#thSizeLabel{font-weight:bold;margin-top:12px;display:block}
+@media(max-width:850px){#thGrid{grid-template-columns:1fr}#thBox{margin:0;border-radius:0;min-height:100vh}}
