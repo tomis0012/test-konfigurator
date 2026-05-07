@@ -9,7 +9,7 @@ if(!h||document.querySelector('#thBtn'))return;
 
 let btn=document.createElement('button');
 btn.id='thBtn';
-btn.textContent='Vytvořit vlastní návrh potisku VERZE EDITOR 2';
+btn.textContent='Vytvořit vlastní návrh potisku VERZE LAYERS 1';
 h.parentNode.insertBefore(btn,h.nextSibling);
 
 document.body.insertAdjacentHTML('beforeend',`
@@ -18,6 +18,7 @@ document.body.insertAdjacentHTML('beforeend',`
 <div id="thGrid">
 <canvas id="thCanvas" width="1100" height="650"></canvas>
 <div id="thPanel">
+
 <button id="thUpload" class="primary">Nahrát foto</button>
 <input id="thFile" type="file" accept="image/*" style="display:none">
 
@@ -50,10 +51,21 @@ document.body.insertAdjacentHTML('beforeend',`
 <label id="thSizeLabel">Velikost fotografie</label>
 <input id="thSize" type="range" min="40" max="1000" value="320">
 
+<div id="thLayersBox">
+<h3>Vrstvy</h3>
+<div id="thLayers"></div>
+<div id="thLayerControls">
+<button id="thLayerUp">Nahoru</button>
+<button id="thLayerDown">Dolů</button>
+</div>
+</div>
+
 <button id="thSave" class="save">Uložit návrh</button>
+
 <p id="thHint">
 Fotku/text posuneš tažením. Pravý dolní roh zvětšuje, levý dolní roh otáčí, pravý horní křížek maže.
 </p>
+
 </div></div></div></div>`);
 
 const c=document.querySelector('#thCanvas'),ctx=c.getContext('2d');
@@ -61,7 +73,8 @@ const area={x:150,y:165,w:800,h:360},side=120;
 
 function bg(){
 ctx.clearRect(0,0,c.width,c.height);
-ctx.fillStyle='#eee';ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle='#eee';
+ctx.fillRect(0,0,c.width,c.height);
 
 ctx.fillStyle='#d8d8d8';
 ctx.fillRect(area.x-side,area.y,side,area.h);
@@ -139,14 +152,6 @@ ctx.font='bold '+el.size+'px '+(el.font||'Arial');
 return{w:Math.max(60,ctx.measureText(el.text).width+24),h:el.size+24};
 }
 
-function world(el,lx,ly){
-let a=(el.r||0)*Math.PI/180;
-return{
-x:el.x+lx*Math.cos(a)-ly*Math.sin(a),
-y:el.y+lx*Math.sin(a)+ly*Math.cos(a)
-};
-}
-
 function drawControls(el){
 let b=bounds(el),w=b.w,h=b.h;
 ctx.save();
@@ -180,14 +185,17 @@ if(type==='x'){
 ctx.moveTo(x-7,y-7);ctx.lineTo(x+7,y+7);
 ctx.moveTo(x+7,y-7);ctx.lineTo(x-7,y+7);
 }
+
 if(type==='resize'){
 ctx.moveTo(x-8,y+7);ctx.lineTo(x+7,y-8);
 ctx.moveTo(x-2,y+8);ctx.lineTo(x+8,y+8);ctx.lineTo(x+8,y-2);
 }
+
 if(type==='rotate'){
 ctx.arc(x,y,8,0.8,5.2);
 ctx.moveTo(x-8,y-2);ctx.lineTo(x-15,y-2);ctx.lineTo(x-12,y-9);
 }
+
 ctx.stroke();
 }
 
@@ -216,8 +224,9 @@ let spots=[
 {type:'resize',x:b.w/2,y:b.h/2},
 {type:'rotate',x:-b.w/2,y:b.h/2}
 ];
+
 for(let s of spots){
-if(Math.hypot(lp.x-s.x,lp.y-s.y)<=26)return s.type;
+if(Math.hypot(lp.x-s.x,lp.y-s.y)<=30)return s.type;
 }
 return null;
 }
@@ -230,7 +239,43 @@ if(lp.x>=-b.w/2&&lp.x<=b.w/2&&lp.y>=-b.h/2&&lp.y<=b.h/2)return el;
 return null;
 }
 
+function layerName(el,index){
+if(el.type==='image')return 'Fotka '+(index+1);
+return 'Text: '+(el.text||'bez textu');
+}
+
+function renderLayers(){
+let box=document.querySelector('#thLayers');
+if(!box)return;
+
+box.innerHTML='';
+
+if(elements.length===0){
+let empty=document.createElement('div');
+empty.style.fontSize='13px';
+empty.style.color='#777';
+empty.textContent='Zatím nejsou vložené žádné vrstvy.';
+box.appendChild(empty);
+return;
+}
+
+elements.slice().reverse().forEach((el,revIndex)=>{
+let realIndex=elements.length-1-revIndex;
+let b=document.createElement('button');
+b.className='thLayerItem'+(el===active?' active':'');
+b.textContent=layerName(el,realIndex);
+b.onclick=function(){
+active=el;
+sync();
+draw();
+};
+box.appendChild(b);
+});
+}
+
 function sync(){
+renderLayers();
+
 let tt=document.querySelector('#thTextTools');
 let size=document.querySelector('#thSize');
 let label=document.querySelector('#thSizeLabel');
@@ -246,6 +291,7 @@ if(active.type==='text'){
 tt.style.display='block';
 label.style.display='none';
 size.style.display='none';
+
 document.querySelector('#thTextInput').value=active.text;
 document.querySelector('#thFontFamily').value=active.font||'Arial';
 document.querySelector('#thTextColor').value=active.color||'#111111';
@@ -266,23 +312,31 @@ let p=pos(e);
 
 if(active){
 let ch=controlHit(p,active);
+
 if(ch==='delete'){
 elements=elements.filter(x=>x!==active);
-active=null;sync();draw();return;
+active=null;
+sync();
+draw();
+return;
 }
+
 if(ch){
 action=ch;
 start={p:p,x:active.x,y:active.y,w:active.w,h:active.h,size:active.size,r:active.r||0};
-draw();return;
+draw();
+return;
 }
 }
 
 active=objectHit(p);
+
 if(active){
 action='move';
 ox=p.x-active.x;
 oy=p.y-active.y;
 }
+
 sync();
 draw();
 };
@@ -290,6 +344,7 @@ draw();
 c.onmousemove=c.ontouchmove=function(e){
 if(!active||!action)return;
 e.preventDefault();
+
 let p=pos(e);
 
 if(action==='move'){
@@ -320,50 +375,158 @@ sync();
 draw();
 };
 
-c.onmouseup=c.onmouseleave=c.ontouchend=function(){action=null};
+c.onmouseup=c.onmouseleave=c.ontouchend=function(){
+action=null;
+};
 
-document.querySelector('#thBtn').onclick=()=>{document.querySelector('#thModal').style.display='block';draw()};
-document.querySelector('#thClose').onclick=()=>document.querySelector('#thModal').style.display='none';
-document.querySelector('#thUpload').onclick=()=>document.querySelector('#thFile').click();
+document.querySelector('#thBtn').onclick=function(){
+document.querySelector('#thModal').style.display='block';
+sync();
+draw();
+};
+
+document.querySelector('#thClose').onclick=function(){
+document.querySelector('#thModal').style.display='none';
+};
+
+document.querySelector('#thUpload').onclick=function(){
+document.querySelector('#thFile').click();
+};
 
 document.querySelector('#thFile').onchange=function(e){
-let f=e.target.files[0];if(!f)return;
+let f=e.target.files[0];
+if(!f)return;
+
 let r=new FileReader();
+
 r.onload=function(ev){
 let img=new Image();
+
 img.onload=function(){
 let ratio=img.height/img.width;
-let el={type:'image',img:img,x:area.x+area.w/2,y:area.y+area.h/2,w:360,h:360*ratio,r:0};
-elements.push(el);active=el;sync();draw();
+let el={
+type:'image',
+img:img,
+x:area.x+area.w/2,
+y:area.y+area.h/2,
+w:360,
+h:360*ratio,
+r:0
 };
+
+elements.push(el);
+active=el;
+sync();
+draw();
+};
+
 img.src=ev.target.result;
 };
+
 r.readAsDataURL(f);
 };
 
 document.querySelector('#thAddText').onclick=function(){
-let el={type:'text',text:'Tvůj text',x:area.x+area.w/2,y:area.y+area.h/2,size:70,font:'Arial',color:'#111111',r:0};
-elements.push(el);active=el;sync();draw();
+let el={
+type:'text',
+text:'Tvůj text',
+x:area.x+area.w/2,
+y:area.y+area.h/2,
+size:70,
+font:'Arial',
+color:'#111111',
+r:0
 };
 
-document.querySelector('#thTextInput').oninput=e=>{if(active&&active.type==='text'){active.text=e.target.value;draw()}};
-document.querySelector('#thFontFamily').onchange=e=>{if(active&&active.type==='text'){active.font=e.target.value;draw()}};
-document.querySelector('#thTextColor').oninput=e=>{if(active&&active.type==='text'){active.color=e.target.value;draw()}};
-document.querySelector('#thTextSize').oninput=e=>{if(active&&active.type==='text'){active.size=+e.target.value;draw()}};
-document.querySelector('#thTextRotate').oninput=e=>{if(active&&active.type==='text'){active.r=+e.target.value;draw()}};
+elements.push(el);
+active=el;
+sync();
+draw();
+};
 
-document.querySelector('#thSize').oninput=e=>{
+document.querySelector('#thTextInput').oninput=function(e){
+if(active&&active.type==='text'){
+active.text=e.target.value;
+sync();
+draw();
+}
+};
+
+document.querySelector('#thFontFamily').onchange=function(e){
+if(active&&active.type==='text'){
+active.font=e.target.value;
+sync();
+draw();
+}
+};
+
+document.querySelector('#thTextColor').oninput=function(e){
+if(active&&active.type==='text'){
+active.color=e.target.value;
+sync();
+draw();
+}
+};
+
+document.querySelector('#thTextSize').oninput=function(e){
+if(active&&active.type==='text'){
+active.size=+e.target.value;
+sync();
+draw();
+}
+};
+
+document.querySelector('#thTextRotate').oninput=function(e){
+if(active&&active.type==='text'){
+active.r=+e.target.value;
+sync();
+draw();
+}
+};
+
+document.querySelector('#thSize').oninput=function(e){
 if(active&&active.type==='image'){
 let ratio=active.h/active.w;
 active.w=+e.target.value;
 active.h=active.w*ratio;
+sync();
 draw();
 }
 };
 
-document.querySelector('#thSave').onclick=()=>alert('Další krok: export návrhu + upload na cloud + odkaz do objednávky.');
+document.querySelector('#thLayerUp').onclick=function(){
+if(!active)return;
 
+let i=elements.indexOf(active);
+if(i<elements.length-1){
+let tmp=elements[i+1];
+elements[i+1]=elements[i];
+elements[i]=tmp;
+sync();
 draw();
 }
+};
+
+document.querySelector('#thLayerDown').onclick=function(){
+if(!active)return;
+
+let i=elements.indexOf(active);
+if(i>0){
+let tmp=elements[i-1];
+elements[i-1]=elements[i];
+elements[i]=tmp;
+sync();
+draw();
+}
+};
+
+document.querySelector('#thSave').onclick=function(){
+alert('Další krok: export návrhu + upload na cloud + odkaz do objednávky.');
+};
+
+sync();
+draw();
+}
+
 document.addEventListener('DOMContentLoaded',ready);
 })();
