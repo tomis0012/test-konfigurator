@@ -97,3 +97,36 @@
   gap:6px;
   margin-top:8px;
 }
+#thLayersBox{
+  border:1px solid #ddd;
+  background:#fafafa;
+  padding:10px;
+  margin:10px 0;
+}
+
+#thLayersBox h3{
+  margin:0 0 8px;
+  font-size:15px;
+}
+
+.thLayerItem{
+  width:100%;
+  padding:8px;
+  margin:4px 0;
+  border:1px solid #ccc;
+  background:#fff;
+  cursor:pointer;
+  text-align:left;
+}
+
+.thLayerItem.active{
+  background:#111;
+  color:#fff;
+}
+
+#thLayerControls{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+  margin-top:8px;
+}
