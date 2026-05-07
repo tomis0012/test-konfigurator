@@ -57,3 +57,10 @@
     z-index:5;
   }
 }
+#thHint::after{
+  content:" CSS v4 načteno";
+  display:block;
+  margin-top:8px;
+  color:#d22;
+  font-weight:bold;
+}
