@@ -15,7 +15,7 @@ if(!h||document.querySelector('#thBtn'))return;
 
 let btn=document.createElement('button');
 btn.id='thBtn';
-btn.textContent='Vytvořit vlastní návrh potisku VERZE MOBILE MUG 1';
+btn.textContent='Vytvořit vlastní návrh potisku VERZE MOBILE MUG 2';
 h.parentNode.insertBefore(btn,h.nextSibling);
 
 document.body.insertAdjacentHTML('beforeend',`
@@ -26,11 +26,9 @@ document.body.insertAdjacentHTML('beforeend',`
     <button id="thUpload" class="thTopBtn">Přidat obrázek</button>
   </div>
 
-  <div id="thEmojiRow">
-    <button class="thEmojiBtn" data-emoji="❤️">❤️</button>
-    <button class="thEmojiBtn" data-emoji="😊">😊</button>
-    <button class="thEmojiBtn" data-emoji="⭐">⭐</button>
-    <button class="thEmojiBtn" data-emoji="🔥">🔥</button>
+  <button id="thEmojiToggle">Přidat smajlík 🙂</button>
+  <div id="thEmojiPicker">
+    ${['❤️','😊','⭐','🔥','😍','😂','🥰','👍','🎁','🎂','👑','🐶','🐱','🌸','☕','🍀','💙','💛','💚','🖤','✨','🎉','💪','🥳'].map(e=>`<button class="thEmojiBtn" data-emoji="${e}">${e}</button>`).join('')}
   </div>
 
   <input id="thFile" type="file" accept="image/*" style="display:none">
@@ -42,18 +40,10 @@ document.body.insertAdjacentHTML('beforeend',`
     <label>Barva textu</label><input id="thTextColor" type="color" value="#111111">
     <label>Font</label>
     <select id="thFontFamily">
-      <option value="Arial">Arial</option>
-      <option value="Poppins">Poppins</option>
-      <option value="Montserrat">Montserrat</option>
-      <option value="Fredoka">Fredoka</option>
-      <option value="Comfortaa">Comfortaa</option>
-      <option value="Pacifico">Pacifico</option>
-      <option value="Dancing Script">Dancing Script</option>
-      <option value="Lobster">Lobster</option>
-      <option value="Bebas Neue">Bebas Neue</option>
-      <option value="Playfair Display">Playfair Display</option>
-      <option value="Amatic SC">Amatic SC</option>
-      <option value="Impact">Impact</option>
+      <option value="Arial">Arial</option><option value="Poppins">Poppins</option><option value="Montserrat">Montserrat</option>
+      <option value="Fredoka">Fredoka</option><option value="Comfortaa">Comfortaa</option><option value="Pacifico">Pacifico</option>
+      <option value="Dancing Script">Dancing Script</option><option value="Lobster">Lobster</option><option value="Bebas Neue">Bebas Neue</option>
+      <option value="Playfair Display">Playfair Display</option><option value="Amatic SC">Amatic SC</option><option value="Impact">Impact</option>
     </select>
     <label>Natočení</label><input id="thTextRotate" type="range" min="-180" max="180" value="0">
   </div>
@@ -78,96 +68,68 @@ document.body.insertAdjacentHTML('beforeend',`
 </div></div></div>`);
 
 const c=document.querySelector('#thCanvas'),ctx=c.getContext('2d');
-const area={x:245,y:185,w:610,h:274.5};
+const area={x:170,y:165,w:760,h:342};
 let guides=[];
 
 function bg(){
 ctx.clearRect(0,0,c.width,c.height);
-ctx.fillStyle='#fff';
-ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);
 
-drawMugHandle(area.x-46,area.y+area.h/2,true);
-drawMugHandle(area.x+area.w+46,area.y+area.h/2,false);
+drawMugHandle(area.x-20,area.y+area.h/2,'left');
+drawMugHandle(area.x+area.w+20,area.y+area.h/2,'right');
 
-ctx.fillStyle='#fff';
-ctx.fillRect(area.x,area.y,area.w,area.h);
+ctx.fillStyle='#fff';ctx.fillRect(area.x,area.y,area.w,area.h);
+ctx.strokeStyle='#202020';ctx.lineWidth=3;ctx.setLineDash([8,5]);ctx.strokeRect(area.x,area.y,area.w,area.h);ctx.setLineDash([]);
 
-ctx.strokeStyle='#202020';
-ctx.lineWidth=3;
-ctx.setLineDash([8,5]);
-ctx.strokeRect(area.x,area.y,area.w,area.h);
-ctx.setLineDash([]);
-
-ctx.fillStyle='#758096';
-ctx.font='18px Arial';
-ctx.textAlign='center';
+ctx.fillStyle='#758096';ctx.font='18px Arial';ctx.textAlign='center';
 ctx.fillText('Plocha potisku 20 × 9 cm',area.x+area.w/2,area.y-18);
 }
 
-function drawMugHandle(cx,cy,flip){
+function drawMugHandle(cx,cy,side){
 ctx.save();
 ctx.translate(cx,cy);
-if(flip)ctx.scale(-1,1);
 
-let grad=ctx.createLinearGradient(0,-135,120,135);
-grad.addColorStop(0,'#f8f8f8');
-grad.addColorStop(.45,'#d9d9d9');
-grad.addColorStop(1,'#ffffff');
+let dir=side==='left'?-1:1;
+let grad=ctx.createLinearGradient(dir*140,-120,dir*20,120);
+grad.addColorStop(0,'#fff');grad.addColorStop(.45,'#d8d8d8');grad.addColorStop(1,'#fff');
 
-ctx.strokeStyle=grad;
-ctx.lineWidth=34;
-ctx.lineCap='round';
+ctx.strokeStyle=grad;ctx.lineWidth=34;ctx.lineCap='round';
 ctx.beginPath();
-ctx.moveTo(0,-112);
-ctx.bezierCurveTo(-125,-112,-125,112,0,112);
+ctx.moveTo(0,-118);
+ctx.bezierCurveTo(dir*145,-118,dir*145,118,0,118);
 ctx.stroke();
 
-ctx.strokeStyle='#ffffff';
-ctx.lineWidth=20;
+ctx.strokeStyle='#fff';ctx.lineWidth=20;
 ctx.beginPath();
-ctx.moveTo(0,-74);
-ctx.bezierCurveTo(-78,-74,-78,74,0,74);
+ctx.moveTo(0,-78);
+ctx.bezierCurveTo(dir*90,-78,dir*90,78,0,78);
 ctx.stroke();
 
 ctx.restore();
 }
 
 function drawElement(el){
-ctx.save();
-ctx.translate(el.x,el.y);
-ctx.rotate((el.r||0)*Math.PI/180);
-
+ctx.save();ctx.translate(el.x,el.y);ctx.rotate((el.r||0)*Math.PI/180);
 if(el.type==='image'){ctx.drawImage(el.img,-el.w/2,-el.h/2,el.w,el.h)}
-else{
-ctx.fillStyle=el.color||'#111';
-ctx.font='bold '+el.size+'px '+(el.font||'Arial');
-ctx.textAlign='center';
-ctx.textBaseline='middle';
-ctx.fillText(el.text,0,0);
-}
+else{ctx.fillStyle=el.color||'#111';ctx.font='bold '+el.size+'px '+(el.font||'Arial');ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(el.text,0,0)}
 ctx.restore();
 }
 
 function localPoint(p,el){
 let a=-(el.r||0)*Math.PI/180,dx=p.x-el.x,dy=p.y-el.y;
-return{x:dx*Math.cos(a)-dy*Math.sin(a),y:dx*Math.sin(a)+dy*Math.cos(a)};
+return{x:dx*Math.cos(a)-dy*Math.sin(a),y:dx*Math.sin(a)+dy*Math.cos(a)}
 }
 
 function bounds(el){
 if(el.type==='image')return{w:el.w,h:el.h};
 ctx.font='bold '+el.size+'px '+(el.font||'Arial');
-return{w:Math.max(70,ctx.measureText(el.text).width+24),h:el.size+24};
+return{w:Math.max(70,ctx.measureText(el.text).width+24),h:el.size+24}
 }
 
 function drawGuides(){
 if(!guides.length)return;
 ctx.save();ctx.strokeStyle='#ff3b30';ctx.lineWidth=2;ctx.setLineDash([6,6]);
-guides.forEach(g=>{
-ctx.beginPath();
-if(g.type==='v'){ctx.moveTo(g.x,area.y-20);ctx.lineTo(g.x,area.y+area.h+20)}
-else{ctx.moveTo(area.x-20,g.y);ctx.lineTo(area.x+area.w+20,g.y)}
-ctx.stroke();
-});
+guides.forEach(g=>{ctx.beginPath();if(g.type==='v'){ctx.moveTo(g.x,area.y-20);ctx.lineTo(g.x,area.y+area.h+20)}else{ctx.moveTo(area.x-20,g.y);ctx.lineTo(area.x+area.w+20,g.y)}ctx.stroke()});
 ctx.restore();
 }
 
@@ -193,8 +155,7 @@ ctx.stroke();
 function draw(){
 bg();
 ctx.save();ctx.beginPath();ctx.rect(area.x,area.y,area.w,area.h);ctx.clip();elements.forEach(drawElement);ctx.restore();
-drawGuides();
-if(active)drawControls(active);
+drawGuides();if(active)drawControls(active);
 }
 
 function pos(e){let r=c.getBoundingClientRect(),p=e.touches?e.touches[0]:e;return{x:(p.clientX-r.left)*(c.width/r.width),y:(p.clientY-r.top)*(c.height/r.height)}}
@@ -202,9 +163,7 @@ function pos(e){let r=c.getBoundingClientRect(),p=e.touches?e.touches[0]:e;retur
 function snapMove(el){
 guides=[];
 let b=bounds(el),targetsX=[area.x,area.x+area.w/2,area.x+area.w],targetsY=[area.y,area.y+area.h/2,area.y+area.h];
-let pointsX=[{v:el.x-b.w/2,o:b.w/2},{v:el.x,o:0},{v:el.x+b.w/2,o:-b.w/2}];
-let pointsY=[{v:el.y-b.h/2,o:b.h/2},{v:el.y,o:0},{v:el.y+b.h/2,o:-b.h/2}];
-
+let pointsX=[{v:el.x-b.w/2,o:b.w/2},{v:el.x,o:0},{v:el.x+b.w/2,o:-b.w/2}],pointsY=[{v:el.y-b.h/2,o:b.h/2},{v:el.y,o:0},{v:el.y+b.h/2,o:-b.h/2}];
 for(let t of targetsX){for(let p of pointsX){if(Math.abs(p.v-t)<SNAP){el.x=t+p.o;guides.push({type:'v',x:t});break}}}
 for(let t of targetsY){for(let p of pointsY){if(Math.abs(p.v-t)<SNAP){el.y=t+p.o;guides.push({type:'h',y:t});break}}}
 }
@@ -229,15 +188,10 @@ if(elements.length===0){let empty=document.createElement('div');empty.className=
 elements.slice().reverse().forEach((el,revIndex)=>{
 let realIndex=elements.length-1-revIndex,item=document.createElement('div');
 item.className='thLayerItem'+(el===active?' active':'');item.draggable=true;item.dataset.id=el.id;
-
-let thumb='';
-if(el.type==='image'&&el.img&&el.img.src){thumb='<span class="thLayerThumb"><img src="'+el.img.src+'"></span>'}
-else{thumb='<span class="thLayerThumb">'+(el.text&&el.text.length<=2?el.text:'T')+'</span>'}
-
+let thumb=el.type==='image'&&el.img&&el.img.src?'<span class="thLayerThumb"><img src="'+el.img.src+'"></span>':'<span class="thLayerThumb">'+(el.text&&el.text.length<=2?el.text:'T')+'</span>';
 item.innerHTML='<span class="thDrag">☷</span>'+thumb+'<span class="thLayerName"></span><button class="thIconBtn" type="button"></button><button class="thIconBtn" type="button">×</button>';
 item.querySelector('.thLayerName').textContent=layerName(el,realIndex);
 let btns=item.querySelectorAll('button');btns[0].textContent=el.locked?'🔒':'🔓';
-
 item.onclick=()=>{active=el;sync();draw()};
 btns[0].onclick=ev=>{ev.stopPropagation();saveHistory();el.locked=!el.locked;active=el;sync();draw()};
 btns[1].onclick=ev=>{ev.stopPropagation();saveHistory();elements=elements.filter(x=>x!==el);if(active===el)active=null;sync();draw()};
@@ -284,18 +238,19 @@ c.onmouseup=c.onmouseleave=c.ontouchend=function(){action=null;guides=[];draw()}
 document.querySelector('#thBtn').onclick=()=>{document.querySelector('#thModal').style.display='block';sync();draw()};
 document.querySelector('#thClose').onclick=()=>document.querySelector('#thModal').style.display='none';
 document.querySelector('#thUpload').onclick=()=>document.querySelector('#thFile').click();
+document.querySelector('#thEmojiToggle').onclick=()=>{let p=document.querySelector('#thEmojiPicker');p.style.display=p.style.display==='grid'?'none':'grid'};
 
 document.querySelector('#thFile').onchange=function(e){
 let f=e.target.files[0];if(!f)return;saveHistory();
 let r=new FileReader();
-r.onload=function(ev){let img=new Image();img.onload=function(){let ratio=img.height/img.width;let el={id:uid(),type:'image',name:'Obrázek '+(elements.filter(x=>x.type==='image').length+1),img:img,x:area.x+area.w/2,y:area.y+area.h/2,w:220,h:220*ratio,r:0,locked:false};elements.push(el);active=el;sync();draw()};img.src=ev.target.result};
+r.onload=function(ev){let img=new Image();img.onload=function(){let ratio=img.height/img.width;let el={id:uid(),type:'image',name:'Obrázek '+(elements.filter(x=>x.type==='image').length+1),img:img,x:area.x+area.w/2,y:area.y+area.h/2,w:250,h:250*ratio,r:0,locked:false};elements.push(el);active=el;sync();draw()};img.src=ev.target.result};
 r.readAsDataURL(f);
 };
 
 function addText(value,isEmoji){
 saveHistory();
 let count=elements.filter(x=>x.type==='text').length+1;
-let el={id:uid(),type:'text',name:isEmoji?'Smajlík '+count:'Text '+count,text:value,x:area.x+area.w/2,y:area.y+area.h/2,size:isEmoji?70:58,font:isEmoji?'Arial':'Poppins',color:'#111111',r:0,locked:false};
+let el={id:uid(),type:'text',name:isEmoji?'Smajlík '+count:'Text '+count,text:value,x:area.x+area.w/2,y:area.y+area.h/2,size:isEmoji?72:62,font:isEmoji?'Arial':'Poppins',color:'#111111',r:0,locked:false};
 elements.push(el);active=el;sync();draw();
 }
 
