@@ -34,14 +34,121 @@
 #thReset{left:330px}
 #thUndo{left:440px}
 #thHint{font-size:12px;color:#7c8ca3;line-height:1.45;margin-top:14px}
-#thHint::after{content:" CSS LAYERS 3 načteno";display:block;margin-top:8px;color:#d22;font-weight:bold}
+#thHint::after{content:" CSS MOBILE FIX 1 načteno";display:block;margin-top:8px;color:#d22;font-weight:bold}
 
 @media(max-width:850px){
-  #thBox{margin:0;border-radius:0;min-height:100vh}
-  #thGrid{grid-template-columns:1fr}
-  #thPanel{border-right:0;border-bottom:1px solid #dce4ef}
-  #thCanvasWrap{min-height:480px;padding:12px}
-  #thSave{position:sticky;bottom:12px;width:100%;margin-top:14px}
-  #thReset,#thUndo{position:static;width:100%;margin-top:10px}
-  #thClose{top:12px;right:12px}
+  #thModal{
+    background:#fff;
+  }
+
+  #thBox{
+    margin:0;
+    border-radius:0;
+    min-height:100vh;
+    box-shadow:none;
+  }
+
+  #thGrid{
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
+  }
+
+  #thCanvasWrap{
+    order:1;
+    width:100%;
+    min-height:auto;
+    height:auto;
+    padding:58px 10px 16px;
+    display:block;
+    background:#fff;
+    border-bottom:1px solid #dce4ef;
+    box-sizing:border-box;
+  }
+
+  #thCanvas{
+    display:block;
+    width:100%;
+    max-width:100%;
+    height:auto;
+    margin:0 auto;
+  }
+
+  #thPanel{
+    order:2;
+    width:100%;
+    border-right:0;
+    border-bottom:0;
+    padding:14px;
+    background:#f5f8fc;
+    box-sizing:border-box;
+  }
+
+  #thClose{
+    top:12px;
+    right:12px;
+    width:42px;
+    height:42px;
+    font-size:28px;
+    z-index:20;
+  }
+
+  #thActionRow{
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:12px;
+  }
+
+  .thTopBtn{
+    padding:13px 8px;
+    border-radius:14px;
+    font-size:15px;
+  }
+
+  #thEmojiRow{
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+  }
+
+  .thEmojiBtn{
+    padding:11px 4px;
+    font-size:24px;
+  }
+
+  #thSave,
+  #thReset,
+  #thUndo{
+    position:static;
+    width:100%;
+    display:block;
+    box-sizing:border-box;
+    margin-top:10px;
+    border-radius:16px;
+    text-align:center;
+  }
+
+  #thSave{
+    order:3;
+    padding:15px 18px;
+    box-shadow:0 8px 20px rgba(52,120,246,.25);
+  }
+
+  #thReset,
+  #thUndo{
+    padding:13px 18px;
+  }
+
+  #thCanvasWrap #thReset,
+  #thCanvasWrap #thUndo,
+  #thCanvasWrap #thSave{
+    max-width:100%;
+  }
+
+  #thLayersBox{
+    margin-top:14px;
+  }
+
+  #thHint{
+    margin-bottom:10px;
+  }
 }
