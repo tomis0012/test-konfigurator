@@ -15,7 +15,7 @@ if(!h||document.querySelector('#thBtn'))return;
 
 let btn=document.createElement('button');
 btn.id='thBtn';
-btn.textContent='Vytvořit vlastní návrh potisku VERZE LAYERS 3';
+btn.textContent='Vytvořit vlastní návrh potisku VERZE MOBILE MUG 1';
 h.parentNode.insertBefore(btn,h.nextSibling);
 
 document.body.insertAdjacentHTML('beforeend',`
@@ -65,7 +65,7 @@ document.body.insertAdjacentHTML('beforeend',`
   </div>
 
   <div id="thLayersBox"><h3>Vrstvy</h3><div id="thLayers"></div></div>
-  <p id="thHint">Při posunu se prvky přichytávají na střed a okraje potiskové plochy. Vrstvy lze přetahovat.</p>
+  <p id="thHint">Při posunu se prvky přichytávají na střed a okraje potiskové plochy. Vrstvy lze přetahovat, zamknout a mazat.</p>
 </div>
 
 <div id="thCanvasWrap">
@@ -78,36 +78,72 @@ document.body.insertAdjacentHTML('beforeend',`
 </div></div></div>`);
 
 const c=document.querySelector('#thCanvas'),ctx=c.getContext('2d');
-const area={x:150,y:165,w:800,h:360},side=120;
+const area={x:245,y:185,w:610,h:274.5};
 let guides=[];
 
 function bg(){
 ctx.clearRect(0,0,c.width,c.height);
-ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);
-ctx.fillStyle='#f4f6fa';ctx.fillRect(area.x-side,area.y,side,area.h);ctx.fillRect(area.x+area.w,area.y,side,area.h);
-drawHandle(area.x-side-38,area.y+area.h/2,true);drawHandle(area.x+area.w+side+38,area.y+area.h/2,false);
-ctx.fillStyle='#fff';ctx.fillRect(area.x,area.y,area.w,area.h);
-ctx.strokeStyle='#202020';ctx.lineWidth=3;ctx.setLineDash([8,5]);ctx.strokeRect(area.x,area.y,area.w,area.h);ctx.setLineDash([]);
-ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=2;ctx.beginPath();
-ctx.moveTo(area.x+50,area.y+30);ctx.bezierCurveTo(area.x+55,area.y+130,area.x+90,area.y+210,area.x+70,area.y+300);
-ctx.moveTo(area.x+area.w-50,area.y+30);ctx.bezierCurveTo(area.x+area.w-55,area.y+130,area.x+area.w-90,area.y+210,area.x+area.w-70,area.y+300);ctx.stroke();
-ctx.fillStyle='#758096';ctx.font='18px Arial';ctx.textAlign='center';ctx.fillText('Plocha potisku 20 × 9 cm',area.x+area.w/2,area.y-18);
+ctx.fillStyle='#fff';
+ctx.fillRect(0,0,c.width,c.height);
+
+drawMugHandle(area.x-46,area.y+area.h/2,true);
+drawMugHandle(area.x+area.w+46,area.y+area.h/2,false);
+
+ctx.fillStyle='#fff';
+ctx.fillRect(area.x,area.y,area.w,area.h);
+
+ctx.strokeStyle='#202020';
+ctx.lineWidth=3;
+ctx.setLineDash([8,5]);
+ctx.strokeRect(area.x,area.y,area.w,area.h);
+ctx.setLineDash([]);
+
+ctx.fillStyle='#758096';
+ctx.font='18px Arial';
+ctx.textAlign='center';
+ctx.fillText('Plocha potisku 20 × 9 cm',area.x+area.w/2,area.y-18);
 }
 
-function drawHandle(cx,cy,flip){
-ctx.save();ctx.translate(cx,cy);if(flip)ctx.scale(-1,1);
-ctx.strokeStyle='#d2d8e2';ctx.lineWidth=30;ctx.beginPath();ctx.moveTo(0,-135);ctx.bezierCurveTo(135,-125,135,125,0,135);ctx.stroke();
-ctx.strokeStyle='#fff';ctx.lineWidth=18;ctx.beginPath();ctx.moveTo(0,-92);ctx.bezierCurveTo(82,-82,82,82,0,92);ctx.stroke();
+function drawMugHandle(cx,cy,flip){
+ctx.save();
+ctx.translate(cx,cy);
+if(flip)ctx.scale(-1,1);
+
+let grad=ctx.createLinearGradient(0,-135,120,135);
+grad.addColorStop(0,'#f8f8f8');
+grad.addColorStop(.45,'#d9d9d9');
+grad.addColorStop(1,'#ffffff');
+
+ctx.strokeStyle=grad;
+ctx.lineWidth=34;
+ctx.lineCap='round';
+ctx.beginPath();
+ctx.moveTo(0,-112);
+ctx.bezierCurveTo(-125,-112,-125,112,0,112);
+ctx.stroke();
+
+ctx.strokeStyle='#ffffff';
+ctx.lineWidth=20;
+ctx.beginPath();
+ctx.moveTo(0,-74);
+ctx.bezierCurveTo(-78,-74,-78,74,0,74);
+ctx.stroke();
+
 ctx.restore();
 }
 
 function drawElement(el){
-ctx.save();ctx.translate(el.x,el.y);ctx.rotate((el.r||0)*Math.PI/180);
+ctx.save();
+ctx.translate(el.x,el.y);
+ctx.rotate((el.r||0)*Math.PI/180);
+
 if(el.type==='image'){ctx.drawImage(el.img,-el.w/2,-el.h/2,el.w,el.h)}
 else{
 ctx.fillStyle=el.color||'#111';
 ctx.font='bold '+el.size+'px '+(el.font||'Arial');
-ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(el.text,0,0);
+ctx.textAlign='center';
+ctx.textBaseline='middle';
+ctx.fillText(el.text,0,0);
 }
 ctx.restore();
 }
@@ -189,13 +225,19 @@ function layerName(el,index){if(el.name)return el.name;if(el.type==='image')retu
 
 function renderLayers(){
 let box=document.querySelector('#thLayers'); if(!box)return; box.innerHTML='';
-if(elements.length===0){let empty=document.createElement('div');empty.className='thEmptyLayers';empty.textContent='Zatím nejsou vložené žádné vrstvy.';box.appendChild(empty);return}
+if(elements.length===0){let empty=document.createElement('div');empty.className='thEmptyLayers';empty.innerHTML='Žádné prvky.<br>Přidejte text nebo obrázek.';box.appendChild(empty);return}
 elements.slice().reverse().forEach((el,revIndex)=>{
 let realIndex=elements.length-1-revIndex,item=document.createElement('div');
 item.className='thLayerItem'+(el===active?' active':'');item.draggable=true;item.dataset.id=el.id;
-item.innerHTML='<span class="thDrag">☷</span><span class="thLayerName"></span><button class="thIconBtn" type="button"></button><button class="thIconBtn" type="button">×</button>';
+
+let thumb='';
+if(el.type==='image'&&el.img&&el.img.src){thumb='<span class="thLayerThumb"><img src="'+el.img.src+'"></span>'}
+else{thumb='<span class="thLayerThumb">'+(el.text&&el.text.length<=2?el.text:'T')+'</span>'}
+
+item.innerHTML='<span class="thDrag">☷</span>'+thumb+'<span class="thLayerName"></span><button class="thIconBtn" type="button"></button><button class="thIconBtn" type="button">×</button>';
 item.querySelector('.thLayerName').textContent=layerName(el,realIndex);
 let btns=item.querySelectorAll('button');btns[0].textContent=el.locked?'🔒':'🔓';
+
 item.onclick=()=>{active=el;sync();draw()};
 btns[0].onclick=ev=>{ev.stopPropagation();saveHistory();el.locked=!el.locked;active=el;sync();draw()};
 btns[1].onclick=ev=>{ev.stopPropagation();saveHistory();elements=elements.filter(x=>x!==el);if(active===el)active=null;sync();draw()};
@@ -246,14 +288,14 @@ document.querySelector('#thUpload').onclick=()=>document.querySelector('#thFile'
 document.querySelector('#thFile').onchange=function(e){
 let f=e.target.files[0];if(!f)return;saveHistory();
 let r=new FileReader();
-r.onload=function(ev){let img=new Image();img.onload=function(){let ratio=img.height/img.width;let el={id:uid(),type:'image',name:'Obrázek '+(elements.filter(x=>x.type==='image').length+1),img:img,x:area.x+area.w/2,y:area.y+area.h/2,w:360,h:360*ratio,r:0,locked:false};elements.push(el);active=el;sync();draw()};img.src=ev.target.result};
+r.onload=function(ev){let img=new Image();img.onload=function(){let ratio=img.height/img.width;let el={id:uid(),type:'image',name:'Obrázek '+(elements.filter(x=>x.type==='image').length+1),img:img,x:area.x+area.w/2,y:area.y+area.h/2,w:220,h:220*ratio,r:0,locked:false};elements.push(el);active=el;sync();draw()};img.src=ev.target.result};
 r.readAsDataURL(f);
 };
 
 function addText(value,isEmoji){
 saveHistory();
 let count=elements.filter(x=>x.type==='text').length+1;
-let el={id:uid(),type:'text',name:isEmoji?'Smajlík '+count:'Text '+count,text:value,x:area.x+area.w/2,y:area.y+area.h/2,size:isEmoji?90:70,font:isEmoji?'Arial':'Poppins',color:'#111111',r:0,locked:false};
+let el={id:uid(),type:'text',name:isEmoji?'Smajlík '+count:'Text '+count,text:value,x:area.x+area.w/2,y:area.y+area.h/2,size:isEmoji?70:58,font:isEmoji?'Arial':'Poppins',color:'#111111',r:0,locked:false};
 elements.push(el);active=el;sync();draw();
 }
 
